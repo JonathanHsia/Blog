@@ -147,27 +147,140 @@
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-firstCoptic" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Studio2-2中基本配置和使用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/Blog/2017/09/07/firstCoptic/">firstCoptic</a>
+      <a class="article-title" href="/Blog/2017/09/07/Studio2-2中基本配置和使用/">JNI在Android Studio2.2中基本配置和使用</a>
     </h1>
   
 
         
-        <a href="/Blog/2017/09/07/firstCoptic/" class="archive-article-date">
-  	<time datetime="2017-09-07T06:50:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-07</time>
+        <a href="/Blog/2017/09/07/Studio2-2中基本配置和使用/" class="archive-article-date">
+  	<time datetime="2017-09-07T07:46:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-07</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Hello World!</p>
+        <h5 id="1-是什么"><a href="#1-是什么" class="headerlink" title="1.是什么?"></a>1.是什么?</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">1.JNI (Java Native Interface) 它允许Java代码和其他语言写的代码进行交互。JNI 是本地编程接口，它使得在 Java 虚拟机 (VM) 内部运行的 Java 代码能够与用其它编程语言(如 C、C++ 和汇编语言)编写的应用程序和库进行交互操作。</div><div class="line">由于Android的应用层的类都是以Java写的，这些Java类编译为Dex型式的Bytecode之后，必须靠Dalvik虚拟机(VM: Virtual Machine)来执行。</div><div class="line"></div><div class="line">2.NDK</div><div class="line">Native Develop Kit(本地开发工具包),类似于JDK;只是一套工具，它可以帮助开发者在android开发中，它使用的是JNI机制.</div><div class="line"></div><div class="line">3.两者的区别</div><div class="line">JNI      Java Native Interface  **java调用本地接口 的技术名词**</div><div class="line">NDK    Native Developer Kit  **谷歌给开发人员的工具包**</div></pre></td></tr></table></figure>
+<hr>
+<h5 id="2-使用ndkBuilder进行项目的构建"><a href="#2-使用ndkBuilder进行项目的构建" class="headerlink" title="2.使用ndkBuilder进行项目的构建"></a>2.使用ndkBuilder进行项目的构建</h5><ul>
+<li><strong>1. 下载ndk(已装,略过)</strong><br><img src="http://upload-images.jianshu.io/upload_images/1868359-9a1c080319c82bb9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="ndk下载.png"><br><strong>进入项目设置界面</strong></li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/1868359-488651ab5b6c22fe.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="20160531123154969.png"><br><strong>没有安装的话,直接Download即可,PS.在最终安装的时候会卡很长时间,耐心等待安装完成</strong></p>
+<ul>
+<li><p><strong>2.  配置app,build.gradle文件</strong></p>
+<ol>
+<li>在app的build.gradle中,也就是要运行的项目中的build.gradle文件中的defaultConfig节点中增加<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ndk &#123;</div><div class="line">        moduleName <span class="string">"NdkJniDemo"</span>   <span class="comment">//生成的so名字</span></div><div class="line">        ldLibs <span class="string">"log"</span>, <span class="string">"z"</span>, <span class="string">"m"</span>    <span class="comment">//添加依赖库文件，因为有log打印等//非必填加项</span></div><div class="line">        abiFilters <span class="string">"armeabi"</span>, <span class="string">"armeabi-v7a"</span>, <span class="string">"x86"</span> <span class="comment">//输出指定三种abi体系结构下的so库，目前可有可无。//不填写则生成所有</span></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+</ul>
+<hr>
+<ul>
+<li><strong>3. 创建本地需要创建调用C的代码,这里使用一个获取字符串的方法为例</strong><blockquote>
+<p>新建一个工具类JniUtils,使用C获取一个字符串,然后展示到一个</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JniUtils</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">native</span> String <span class="title">getStringFormC</span><span class="params">()</span></span>;</div><div class="line">    ...可以有很多的<span class="keyword">native</span>代码</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</blockquote>
+</li>
+</ul>
+<p><strong> 使用native关键字,表示调用本地的方法,该方法可以使用C/C++语言来实现</strong></p>
+<ul>
+<li><strong>4. 生成.h,C/C++的头文件(熟悉C的知道,可以没有头文件,头文件只是定义类中所有方法(C中没有类的概念))</strong><blockquote>
+<ol>
+<li>build或rebuild或clear一下程序之后,会在build/intermediates/classes/debug目录中生成项目中的所有的class文件,<br><img src="http://upload-images.jianshu.io/upload_images/1868359-d206b645febdea15.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="class文件路径.png"></li>
+<li>命令行进入debug目录cd &lt;路径&gt;</li>
+<li>编译指令<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">javah -jni com.wobiancao.ndkjnidemo.ndk.JniUtils</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+</li>
+</ul>
+<h2 id="注意-这里javah-jni后面跟的是JniUtils类的全路径，如果javah报不存在之-类的，是你的java环境没有配置好。"><a href="#注意-这里javah-jni后面跟的是JniUtils类的全路径，如果javah报不存在之-类的，是你的java环境没有配置好。" class="headerlink" title="注意 这里javah -jni后面跟的是JniUtils类的全路径，如果javah报不存在之 类的，是你的java环境没有配置好。"></a><strong>注意 这里javah -jni后面跟的是JniUtils类的全路径，如果javah报不存在之 类的，是你的java环境没有配置好。</strong></h2><ul>
+<li><p><strong>4.  编译过后会在debug目录下生成一个.h的文件,它的命名方式会很长,基本 是全路径的命名方式</strong></p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jonathanhsia_com_ndktest_utils_JniUtils.h</div></pre></td></tr></table></figure>
+</li>
+<li><p><strong>5.  拷贝文件到项目中的main/jni目录下,如果没有直接创建即可</strong></p>
+</li>
+<li><p><strong>6. 编写C的方法实现</strong></p>
+<ol>
+<li>在jni目录下新建C/C++文件,引用头文件,复写其中的java要调用的C/C++方法,返回一个字符串,</li>
+</ol>
+</li>
+<li><strong>7. 在JniUtils中静态导入C/C++所生成的so包</strong><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> &#123;</div><div class="line">       System.loadLibrary(<span class="string">"NdkJniDemo"</span>);<span class="comment">//之前在build.gradle里面设置的so名字，必须一致</span></div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>此时run之后java代码即可以调用到用C/C++实现的代码了</strong></p>
+<p>“PS. 在run之后,会在build/intermediates/ndk/debug/lib目录下会出现在build.gradle中配置的三种cpu架构的so包,此时删除jni目录中的源码,将这些so包直接的拷入到项目中就可以直接的使用了”</p>
+<hr>
+<p><strong>遇到的坑</strong></p>
+<blockquote>
+<ol>
+<li>C/C++不能格式化代码,否则会出现,编译通过(可能编译出错,但是没有阻止运行),运行不了,报出找不到so包的异常</li>
+<li>首次run的时候可能报出 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Error: NDK integration is d eprecated in the current plugin. Consider trying the new experimental plugin. For details, see http://tools.android.com/tech-docs/new-build-system/gradle-experimental. Set &quot;android.useDeprecatedNdk=true&quot; in gradle.properties to continue using the current NDK integration.</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+<p> 这样的错误,按照里面的提示在gradle.properties文件中增加android.useDeprecatedNdk=true字段即可</p>
+<ol>
+<li><strong>不支持intant run</strong></li>
+<li>两个c同时实现h中的方法,会报错,不允许,逻辑上也是不允许;</li>
+<li>JniUtils的位置不能够随便已经,因为和C/C++文件中是一一对应的引用关系</li>
+</ol>
+<hr>
+<h5 id="3-使用cmake进行项目的构建"><a href="#3-使用cmake进行项目的构建" class="headerlink" title="3.使用cmake进行项目的构建"></a>3.使用cmake进行项目的构建</h5><ul>
+<li><strong>  1. cmake编辑功能是android studio 2.2才支持的新功能;目的是简化jni的开发过程,使用studio2.2新建项目的话,会有相应的让你勾选使用cmake </strong></li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/1868359-1a7efb11460f8b8e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="1474439172560.png"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1868359-8fc9b325d79ba95f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="1474439229866.png"></p>
+<hr>
+<ul>
+<li><strong>2.当勾选了include C++ Support时,在创建项目的时候,会多出如上界面,选择C/C++的标准,此处的设置在app的build.gradle中的defaultConfig会增加设置</strong><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">     externalNativeBuild &#123;</div><div class="line">          cmake &#123;</div><div class="line">              cppFlags <span class="string">"-frtti -fexceptions"</span><span class="comment">//这个标记是第一个选项,如果使用C++11的标准,则使用</span></div><div class="line">              <span class="comment">//cppFlags "-std=c++11"</span></div><div class="line">          &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<ul>
+<li><strong>3.在build.gradle中的android节点下面会增加配置,指定生成so文件配置文件的路径</strong><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">externalNativeBuild &#123;</div><div class="line">      cmake &#123;</div><div class="line">          path <span class="string">"CMakeLists.txt"</span></div><div class="line">      &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<ul>
+<li><strong>4.创建需要调用C/C++代码的java代码,和ndkBuilder相同</strong><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JniUtils</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">native</span> String <span class="title">getStrFromC2</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<ul>
+<li><strong>5.在项目中src/main/中创建cpp目录,里面可以直接的创建cpp源代码,和ndkBuild一样,用C/C++所写的源代码中的方法名称必须是全路径的方法名,然后以Java开头,分割使用下划线.</strong></li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;jni.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">extern</span> <span class="string">"C"</span></div><div class="line">jstring</div><div class="line">Java_com_ndkcmaketestapp_utils_JniUtils_getStrFromC2(JNIEnv *env, jobject thiz) &#123;</div><div class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> hello = <span class="string">"Hello from C++ Two!"</span>;</div><div class="line">    <span class="keyword">return</span> env-&gt;NewStringUTF(hello.c_str());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<ul>
+<li><strong>6.CMakeLists.txt文件中的具体配置</strong><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cmake_minimum_required(VERSION <span class="number">3.4</span>.<span class="number">1</span>) #指定cmake版本</div><div class="line">add_library(form SHARED src<span class="regexp">/main/</span>cpp<span class="regexp">/form.cpp) #hello是生成的so文件的名称,要和cpp文件的名称相同</span></div><div class="line"><span class="regexp">target_link_libraries(hello log android) # 此处增加了,日志的链接库</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<ul>
+<li><strong>7.在java代码中增加引用so库的代码,使代码生效</strong><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JniUtils</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// Used to load the 'native-lib' library on application startup.</span></div><div class="line">    <span class="keyword">static</span> &#123;</div><div class="line">        System.loadLibrary(<span class="string">"form"</span>);<span class="comment">//此处的form库的名称需要和CMakeLists.txt中配置的相同</span></div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">native</span> String <span class="title">getStrFromC2</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<ul>
+<li><strong>8.在run成功之后,会在build目录的上方增加.externalNativeBuild目录,其中.externalNativeBuild/cmake/debug/obj包含所有生成的so包,同样的拷贝到项目中的jniLibs就可以直接的使用</strong><blockquote>
+<p>CMake的优势</p>
+<ul>
+<li>1.可以直接的在C/C++代码中加入断点,进行调试</li>
+<li>2.java引用的C/C++中的方法,可以直接<code>ctrl+左键</code>进入</li>
+<li>3.对于include的头文件,或者库,也可以直接的进入</li>
+<li>4.不需要配置命令行操作,手动的生成头文件,不需要配置<code>android.useDeprecatedNdk=true</code>属性</li>
+</ul>
+</blockquote>
+</li>
+</ul>
 
       
 
@@ -176,22 +289,100 @@
     <div class="article-info article-info-index">
       
       
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/Blog/categories/Android//" class="article-tag-list-link color3">Android</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">jni</a>
         		</li>
       		
 		</ul>
 	</div>
 
+      
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/Blog/2017/09/07/firstCoptic/">展开全文 >></a>
+          <a class="article-more-a" href="/Blog/2017/09/07/Studio2-2中基本配置和使用/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-HexoGrammar" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/Blog/2017/09/07/HexoGrammar/">Hexo 相关语法</a>
+    </h1>
+  
+
+        
+        <a href="/Blog/2017/09/07/HexoGrammar/" class="archive-article-date">
+  	<time datetime="2017-09-07T07:24:22.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-07</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>引用图片<br>md语法无法显示<br>‘<img src="/example.jpg" alt="">‘’<br>hexo正确做法 <img src="/Blog/2017/09/07/HexoGrammar/example.jpg" alt="This is a use local image example" title="This is a use local image example"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Hexo</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/Blog/2017/09/07/HexoGrammar/">展开全文 >></a>
         </p>
       
 
@@ -304,6 +495,18 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">Android</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">jni</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>
