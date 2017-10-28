@@ -3,18 +3,21 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Tag: jni | 技术分享</title>
+  <title>AndroidStudio3.0项目迁移踩坑 | 技术分享</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="我思故我在">
-<meta property="og:type" content="website">
-<meta property="og:title" content="技术分享">
-<meta property="og:url" content="http://yoursite.com/tags/jni/index.html">
+  <meta name="description" content="AndroidStudio3.0刚刚发布两天,便迫不及待的升级了,升级前也明白这次的版本跨度较大,老项目可能存在很多的问题,没成想还是从中午折腾到了晚上十点.不过结果还不错,成功的跑起来了项目. 列出踩过的坑,希望后面要升级的小伙伴遇到类似的问题可以做个参考;  1.升级安装两种升级方法:  直接用自带的更新工具操作步骤: &amp;gt;菜单栏&amp;gt;Help&amp;gt;Check for Updates">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AndroidStudio3.0项目迁移踩坑">
+<meta property="og:url" content="http://yoursite.com/2017/10/27/AndroidStudio3-0项目迁移踩坑/index.html">
 <meta property="og:site_name" content="技术分享">
-<meta property="og:description" content="我思故我在">
+<meta property="og:description" content="AndroidStudio3.0刚刚发布两天,便迫不及待的升级了,升级前也明白这次的版本跨度较大,老项目可能存在很多的问题,没成想还是从中午折腾到了晚上十点.不过结果还不错,成功的跑起来了项目. 列出踩过的坑,希望后面要升级的小伙伴遇到类似的问题可以做个参考;  1.升级安装两种升级方法:  直接用自带的更新工具操作步骤: &amp;gt;菜单栏&amp;gt;Help&amp;gt;Check for Updates">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2017/10/27/AndroidStudio3-0项目迁移踩坑/AS手动检查更新版本.png">
+<meta property="og:updated_time" content="2017-10-28T02:05:49.038Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="技术分享">
-<meta name="twitter:description" content="我思故我在">
+<meta name="twitter:title" content="AndroidStudio3.0项目迁移踩坑">
+<meta name="twitter:description" content="AndroidStudio3.0刚刚发布两天,便迫不及待的升级了,升级前也明白这次的版本跨度较大,老项目可能存在很多的问题,没成想还是从中午折腾到了晚上十点.不过结果还不错,成功的跑起来了项目. 列出踩过的坑,希望后面要升级的小伙伴遇到类似的问题可以做个参考;  1.升级安装两种升级方法:  直接用自带的更新工具操作步骤: &amp;gt;菜单栏&amp;gt;Help&amp;gt;Check for Updates">
+<meta name="twitter:image" content="http://yoursite.com/2017/10/27/AndroidStudio3-0项目迁移踩坑/AS手动检查更新版本.png">
   
     <link rel="alternate" href="/atom.xml" title="技术分享" type="application/atom+xml">
   
@@ -67,39 +70,68 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/Blog/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/Blog/2017/09/07/Studio2-2中基本配置和使用/" class="archive-article-date">
-  <time datetime="2017-09-07T07:46:00.000Z" itemprop="datePublished">9月 7</time>
+        <section id="main"><article id="post-AndroidStudio3-0项目迁移踩坑" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/Blog/2017/10/27/AndroidStudio3-0项目迁移踩坑/" class="article-date">
+  <time datetime="2017-10-27T13:39:56.000Z" itemprop="datePublished">2017-10-27</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/Blog/2017/09/07/Studio2-2中基本配置和使用/">JNI在Android Studio2.2中基本配置和使用</a>
+    <h1 class="article-title" itemprop="name">
+      AndroidStudio3.0项目迁移踩坑
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p><em>AndroidStudio3.0刚刚发布两天,便迫不及待的升级了,升级前也明白这次的版本跨度较大,老项目可能存在很多的问题,没成想还是从中午折腾到了晚上十点.不过结果还不错,成功的跑起来了项目. 列出踩过的坑,希望后面要升级的小伙伴遇到类似的问题可以做个参考;</em></p>
+<hr>
+<h5 id="1-升级安装"><a href="#1-升级安装" class="headerlink" title="1.升级安装"></a>1.升级安装</h5><p>两种升级方法:</p>
+<ol>
+<li>直接用自带的更新工具<br><br>操作步骤: &gt;菜单栏&gt;Help&gt;Check for Updates..(前提网络要绝对的畅通,你懂的)<br><img src="AS手动检查更新版本.png" alt="如图"></li>
+<li>手动的下载新的版本<br><br>下载地址<a href="https://developer.android.google.cn/studio/archive.html#android-studio-3-0?utm_source=androiddevtools.cn&amp;utm_medium=website" target="_blank" rel="external">https://developer.android.google.cn/studio/archive.html#android-studio-3-0?utm_source=androiddevtools.cn&amp;utm_medium=website</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/27/AndroidStudio3-0项目迁移踩坑/" data-id="cj9aq62500000lkgnxnrgni9d" class="article-share-link">Share</a>
+      
+      
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/Blog/2017/10/28/博客需要用到的素材/Android PDF加载框架/pdfjs-1.8.188-dist - 副本 - 副本/pdf/css/viewer/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/Blog/2017/10/24/ndroid-PDF加载框架/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Android PDF加载框架</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 </section>
         
